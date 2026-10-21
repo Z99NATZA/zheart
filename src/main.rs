@@ -12,7 +12,14 @@ fn main() {
             let inside = r.powi(2) - x.powi(2) - a.powi(2);
             
             if inside >= 0.0 {
-                print!("+ ");
+                let z = inside.sqrt() / (2.0 - y);
+                
+                if z > 0.15 {
+                    print!(": ");
+                }
+                else {
+                    print!(". ");
+                }
             }
             else {
                 print!("  ");
