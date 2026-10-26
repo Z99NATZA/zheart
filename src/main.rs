@@ -5,6 +5,7 @@ fn main() {
     let r: f32 = 0.4;
     let size2 = (size - 1) as f32;
     let mut t: f32 = 0.5;
+    let chars = b" .:-+*#@";
 
     print!("\x1b[2J");
 
@@ -47,15 +48,30 @@ fn main() {
 
         let mut d: [u8; 100 * 40] = [b' '; 100 * 40];
 
+        let valid: Vec<f32> = zb.iter()
+            .copied()
+            .filter(|z| z.is_finite())
+            .collect();
+
+        let minz = valid.iter().copied().reduce(f32::min).unwrap_or(0.0);
+        let maxz = valid.iter().copied().reduce(f32::max).unwrap_or(0.0);
+
         for row in 0..40 {
             for col in 0..100 {
                 let idx = row * 100 + col;
 
-                d[idx] = if zb[idx] != f32::NEG_INFINITY {
-                    b'+'
+                if zb[idx].is_finite() {
+                    let range = maxz - minz;
+                    let k = if range > 0.0 {
+                        (((zb[idx] - minz) / range) * 7.0).round() as usize
+                    } else {
+                        0
+                    };
+
+                    d[idx] = chars[k.min(7)];
                 } else {
-                    b' '
-                };
+                    d[idx] = b' ';
+                }
             }
         }
 
@@ -70,6 +86,6 @@ fn main() {
 
         io::stdout().flush().unwrap();
 
-        t += 0.004;
+        t += 0.006;
     }
 }
